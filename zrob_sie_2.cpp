@@ -79,7 +79,7 @@ int main()
         
     }
     else
-        cout << "Nie uda³o siê otworzyæ pliku";
+        cout << "Nie udalo sie otworzyÃ¦ pliku";
 
     cin.get();
     
