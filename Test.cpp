@@ -1,10 +1,11 @@
 // Test.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
-#define _CRT_SECURE_NO_WARNINGS
+//#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <cstdlib>
 using namespace std;
 
 int main()
@@ -12,50 +13,55 @@ int main()
     string linia1, linia2, linia3;    
     fstream modyfikacja("modyfikacja.txt", ios::out | ios::app);
 
-    FILE* plik = fopen("stop.txt", "r");
+    FILE* plik=NULL;// = fopen("stop.txt", "r");
+    errno_t err;
+
+    // Open for read (will fail if file "crt_fopen_s.c" does not exist)
+    err = fopen_s(&plik, "stop.txt", "r");
+    if (err == 0)
+    {
+        printf("The file 'stop.txt' was opened\n");
+    }
+    else
+    {
+        printf("The file 'stop.txt' was not opened\n");
+    }
+ 
     int wiersze;
     int kolumny;
     int skala;
     char s[5];
-    if (plik == NULL)
-    {
-        printf("Otwarcie nieudane");
-        exit(-1);
-    }
-    fscanf(plik, "%s %d %d %d", &s, &wiersze, &kolumny, &skala); //fscanf zwarca liczbe znakow ktora udalo sie odczytac z pliku
+
+    fscanf_s(plik, "%s", s, _countof(s));
+    fscanf_s(plik, "%d %d %d", &wiersze, &kolumny, &skala);
+     //fscanf zwarca liczbe znakow ktora udalo sie odczytac z pliku
     printf("Wymiar: %s\n", s);
     printf("Wiersze/kolumny: %d %d\n", wiersze, kolumny);
     printf("Skala szarosci: %d\n", skala);
+    char temp;
+    fscanf_s(plik, "%c", &temp);
 
-    //wczytywanie wymiarow
-    int w, k;
-    cout << "Podaj liczbe wierszy: " << endl;
-    cin >> w;
-    cout << "Podaj liczbe kolumn: " << endl;
-    cin >> k;
-
+    int w = wiersze;
+    int k = kolumny;
     int** tab2 = new int* [w];
     for (int i = 0; i < w; i++)
     {
         tab2[i] = new int[k];
+
         for (int j = 0; j < k; j++)
         {
-            /*//metoda I ale chyba sie nie nadaje do tego
-            char znak;
-            while ((znak = fgetc(plik)) != EOF)
-            {
-                tab2[i][j] = znak;
-            }*/
-            /*//metoda II
-            cout << "Wyswietlam tablice: \n ";
-            while (fscanf(plik, "%f", &tab2[i][j]) != EOF)
-            {
-                printf("%i\t", tab2[i][j]);
 
-            }*/
-            //metoda III
-            fscanf(plik, "%f", &tab2[i][j]);
+           
+            char znak;
+            fscanf_s(plik, "%c", &znak);
+            
+            int a = (int)znak;
+            if (a == 10)
+                continue;
+            tab2[i][j] = a;
+                             
         }
+      
     }
     fclose(plik);
 
@@ -86,9 +92,14 @@ int main()
     
     cout << endl << "Wypisujemy tablice: " << endl;
     // wypisz tab2[w][k]
+   
     for (int i = 0; i < w; ++i)
         for (int j = 0; j < k; ++j)
+        {
+            if (j == 98)
+                exit(0);
             cout << tab2[i][j] << '\t';
+        }
 
     /*cout << "Histogram: " << endl;
 
